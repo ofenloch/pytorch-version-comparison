@@ -1,4 +1,5 @@
 import numpy as np
+import os
 import random
 import torch
 import torch.nn as nn
@@ -6,13 +7,25 @@ import torch.optim as optim
 
 
 
-# Set random seeds for reproducibility
-seed = 42
-torch.manual_seed(seed)
-np.random.seed(seed)
-random.seed(seed)
+# Set the random seed for reproducibility
+# This is important for debugging and testing purposes.
+# For testing and debugging we must remove all randomness and non-deterministic algorithms.
+# See https://pytorch.org/docs/stable/notes/randomness.html#reproducibility
+RANDOM_SEED = 42
+print("*********** TEST MODE ***********")
+print("     disabling all randomness")
+print(f"     RANDOM_SEED={RANDOM_SEED}")
+random.seed(RANDOM_SEED)
+np.random.seed(RANDOM_SEED)
+torch.manual_seed(RANDOM_SEED)
+os.environ["PYTHONHASHSEED"] = str(RANDOM_SEED)
 torch.backends.cudnn.deterministic = True
 torch.backends.cudnn.benchmark = False
+torch.set_num_threads(1)
+# torch.use_deterministic_algorithms(True)  # 2 = error, 1 = warn, 0 = quiet (default)
+# The above line does not work with PyTorch 1.4.0
+# AttributeError: module 'torch' has no attribute 'use_deterministic_algorithms'
+print("*********** TEST MODE ***********")
 
 
 # Define the LSTM model
