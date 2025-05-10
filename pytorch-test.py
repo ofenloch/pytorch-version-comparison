@@ -86,3 +86,42 @@ with torch.no_grad():
     test_output = model(test_input)
     torch.set_printoptions(precision=8)
     print(f"Test Output:\n{test_output}")
+    
+
+# Just out of curiosity we add a small bisection. I wanted to 
+# check if other calculations show the same issue.
+
+print("Testing bisection ...")
+    
+def f(x):
+    return 2.0*x*x - 4.0
+
+def bisection(f, left, right, tolerance, max_steps=100) -> float:
+    # check interval boundaries
+    if f(left) * f(right) > 0:
+        print("The function must have different signs at the endpoints.")
+        return float("NaN")
+
+    steps = 0
+    middle = (left + right) / 2.0
+    while ( abs(left - right) > tolerance) and ( abs(f(middle))>tolerance ) and (steps < max_steps):
+        steps += 1
+        print(f"Step {steps:4d}:  left = {left:.12f}, right = {right:.12f}, f(left) = {f(left):.12f}, f(right) = {f(right):.12f}")
+        middle = (left + right) / 2.0
+        if f(middle) * f(left) < 0:
+            right = middle
+        else:
+            left = middle
+    return middle
+
+
+
+max_steps = 100 # Maximum number of iterations
+a = 1.0
+b = 3.0
+tolerance = 1.0E-10 # Tolerance for convergence
+
+x0 = bisection(f, a, b, tolerance, max_steps)
+
+
+print(f"Root: x0 = {x0:.12f}, f(x0) = {f(x0):.12f}")
